@@ -2,6 +2,7 @@ package msqueue;
 
 
 import com.devexperts.dxlab.lincheck.LinChecker;
+import com.devexperts.dxlab.lincheck.annotations.HandleExceptionAsResult;
 import com.devexperts.dxlab.lincheck.annotations.Operation;
 import com.devexperts.dxlab.lincheck.annotations.Param;
 import com.devexperts.dxlab.lincheck.annotations.Reset;
@@ -9,6 +10,7 @@ import com.devexperts.dxlab.lincheck.paramgen.IntGen;
 import com.devexperts.dxlab.lincheck.stress.StressCTest;
 import com.devexperts.dxlab.lincheck.verifier.LongExLinearizabilityVerifier;
 import org.junit.Test;
+import java.util.NoSuchElementException;
 
 
 @StressCTest
@@ -27,11 +29,13 @@ public class LinearizabilityTest {
         queue.enqueue(x);
     }
 
+    @HandleExceptionAsResult(NoSuchElementException.class)
     @Operation
     public int peek() {
         return queue.peek();
     }
 
+    @HandleExceptionAsResult(NoSuchElementException.class)
     @Operation
     public int dequeue() {
         return queue.dequeue();
