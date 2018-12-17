@@ -1,27 +1,21 @@
-# Lock-Free Treiber Stack
+# Stack with Elimination
 
-[![Build Status](https://travis-ci.com/IST-CONCURRENCY-COURSE-2018/stack-<your_GitHub_account>.svg?token=B2yLGFz6qwxKVjbLm9Ak&branch=master)](https://travis-ci.com/IST-CONCURRENCY-COURSE-2018/stack-<your_GitHub_account>)
+[![Build Status](https://travis-ci.com/ITMO-MPP-2018/stack-elimination-<your_GitHub_account>.svg?token=B2yLGFz6qwxKVjbLm9Ak&branch=master)](https://travis-ci.com/ITMO-MPP-2018/stack-elimination-<your_GitHub_account>)
 
-Under this task, you need to implement the simplest lock-free stack. 
+## Задание
+Необходимо доработать реализацию `StackImpl` таким образом, чтобы она стала безопасной и эффективной при использовании из нескольких потоков одновременно. Для увеличения масштабируемости необходимо использовать технику elimination. Вы можете проверить эффективность вашего решения с помощью `StackBenchmark.java` из задания.
+1.	Напишите базовую реализацию из предыдущего задания.
+2. Добавьте массив фиксированного размера (найдите оптимальное значение для вашей машины экспериментальным способом) для elimination-а.
+3. Операция `push` должна сначала пытаться записать элемент в случайную ячейку массива (нужно делать несколько попыток в соседних ячейках) и в цикле `for` фиксированного размера ждет изменений на этой ячейки (spin wait). Если другой поток "забрал" значение, то операция завершается. Иначе, ячейка "сбрасывается" на начальное состояние и операция происходит как в базовой версии стека.
+4. Операция `pop` должна сначала пытаться найти себе пару в массиве для elimination-а (тоже нужно делать несколько попыток), и только в случае неудачи идёт в голову стека. 
 
-Please, use [IntelliJ IDEA](https://www.jetbrains.com/idea/) (better) or Eclipse/Netbeans (worse) as a development environment. Do not use vim or emacs!
+## Сборка и тестированиеДля тестирования используйте команду `mvn test`. При этом автоматически будут запущены следующие тесты:
+* `FunctionalTest.java` проверяет базовую корректность стека.* `LinearizabilityTest.java` проверяет реализацию стека на корректность в многопоточной среде.
 
-## Project description
-This project includes the following files:
+## Формат сдачи
 
-* `Stack.java` contains the stack interface.* `StackImpl.java` contains a sequential stack implementation. This implementation is not _thread-safe_.
-* `StackBenchmark.java` contains a JMH concurrent benchmark.* `pom.xml` contains information about the project and configuration details used by Maven.
+Выполняйте задание в этом репозитории. По готовности добавьте "+" в таблицу с оценками в столбец "Готово" текущего задания. 
 
-It is simplier to use Java 8 in order not to have problems with modules.
+В случае необходимости доработки домашнего задания после проверки, "+" в таблице замененяется на "?" и создается issue на GitHub-е. Как только необходимые исправления произведены, заменяйте "?" обратно на "+" и закрывайте issue. После этого задание будет проверено ещё раз.
 
-## Task description
-You need to modify the `StackImpl` implementation so that it becomes safe to use from multiple threads simultaneously.
-1.	`Compare-And-Set` primitive should be used for synchronization. Use `AtomicReference` instance to store a link to the stack head (field `head`).2.	All operations should be linearizable. 
-
-## Build and testingUse `mvn test` command to test your solution. The following tests are automatically executed:
-* `FunctionalTest.java` tests the basic correctness (sequential);* `LinearizabilityTest.java` checks for linearizability (concurrent).
-
-## Submission format
-Do the assignment in this repository, and commit (and push!) your solution to submit it. 
-
-Replace `<your_GitHub_account>` in the beginning of this file with your GitHub account before submission (two places: image and build links). This is required to show a build status in Travis.
+Перед сдачей задания замените `<your_GitHub_account>` в начале данного файла на свой логин в GitHub для получения информации о сборке в Travis. Это нужно сделать в двух местах: ссылка на картинку и на билд в Travis-е.
