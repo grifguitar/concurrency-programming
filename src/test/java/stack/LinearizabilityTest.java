@@ -18,7 +18,7 @@ public class LinearizabilityTest {
         stack.push(x);
     }
 
-    @Operation
+    @Operation(handleExceptionsAsResult = EmptyStackException.class)
     public int pop() {
         return stack.pop();
     }
