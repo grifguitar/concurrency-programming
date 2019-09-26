@@ -16,13 +16,13 @@ public interface Queue {
 
     /**
      * Retrieves and removes the head of this queue,
-     * or throws NoSuchElementException if this queue is empty
+     * or returns {@link Integer#MIN_VALUE} if this queue is empty
      */
     int dequeue();
 
     /**
      * Retrieves, but does not remove, the head of this queue,
-     * or throws NoSuchElementException if this queue is empty
+     * or returns {@link Integer#MIN_VALUE} if this queue is empty
      */
     int peek();
 }

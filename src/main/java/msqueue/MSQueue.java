@@ -1,7 +1,5 @@
 package msqueue;
 
-import java.util.NoSuchElementException;
-
 public class MSQueue implements Queue {
     private Node head;
     private Node tail;
@@ -24,7 +22,7 @@ public class MSQueue implements Queue {
         Node curHead = head;
         Node next = head.next;
         if (curHead == tail)
-            throw new NoSuchElementException();
+            return Integer.MIN_VALUE;
         head = next;
         return next.x;
     }
@@ -34,7 +32,7 @@ public class MSQueue implements Queue {
         Node curHead = head;
         Node next = head.next;
         if (curHead == tail)
-            throw new NoSuchElementException();
+            return Integer.MIN_VALUE;
         return next.x;
     }
 

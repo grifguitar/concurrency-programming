@@ -25,13 +25,13 @@ public class FunctionalTest {
                 break;
             case 1:
                 // peek
-                if (!javaQueue.isEmpty())
-                    assertEquals((int) javaQueue.peek(), queue.peek());
+                if (javaQueue.isEmpty()) assertEquals(Integer.MIN_VALUE, queue.peek());
+                else assertEquals((int) javaQueue.peek(), queue.peek());
                 break;
             case 2:
                 // dequeue
-                if (!javaQueue.isEmpty())
-                    assertEquals((int) javaQueue.poll(), queue.dequeue());
+                if (javaQueue.isEmpty()) assertEquals(Integer.MIN_VALUE, queue.dequeue());
+                else assertEquals((int) javaQueue.poll(), queue.dequeue());
                 break;
             }
         }
