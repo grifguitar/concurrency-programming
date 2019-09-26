@@ -1,30 +1,27 @@
 package stack;
 
-
-import com.devexperts.dxlab.lincheck.LinChecker;
-import com.devexperts.dxlab.lincheck.annotations.Operation;
-import com.devexperts.dxlab.lincheck.annotations.Param;
-import com.devexperts.dxlab.lincheck.paramgen.IntGen;
-import com.devexperts.dxlab.lincheck.strategy.stress.StressCTest;
+import org.jetbrains.kotlinx.lincheck.LinChecker;
+import org.jetbrains.kotlinx.lincheck.Options;
+import org.jetbrains.kotlinx.lincheck.annotations.Operation;
+import org.jetbrains.kotlinx.lincheck.strategy.stress.StressOptions;
 import org.junit.Test;
 
-
-@StressCTest
 public class LinearizabilityTest {
     private Stack stack = new StackImpl();
 
     @Operation
-    public void push(@Param(gen = IntGen.class, conf = "0:10") int x) {
+    public void push(int x) {
         stack.push(x);
     }
 
-    @Operation(handleExceptionsAsResult = EmptyStackException.class)
+    @Operation
     public int pop() {
         return stack.pop();
     }
 
     @Test
     public void test() {
-        LinChecker.check(LinearizabilityTest.class);
+        Options options = new StressOptions().sequentialSpecification(SequentialStack.class);
+        LinChecker.check(LinearizabilityTest.class, options);
     }
 }
