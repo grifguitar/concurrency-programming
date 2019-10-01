@@ -1,27 +1,16 @@
 package linked_list_set;
 
-
-import com.devexperts.dxlab.lincheck.LinChecker;
-import com.devexperts.dxlab.lincheck.annotations.Operation;
-import com.devexperts.dxlab.lincheck.annotations.Param;
-import com.devexperts.dxlab.lincheck.annotations.Reset;
-import com.devexperts.dxlab.lincheck.paramgen.IntGen;
-import com.devexperts.dxlab.lincheck.stress.StressCTest;
-import com.devexperts.dxlab.lincheck.verifier.LongExLinearizabilityVerifier;
+import org.jetbrains.kotlinx.lincheck.LinChecker;
+import org.jetbrains.kotlinx.lincheck.annotations.Operation;
+import org.jetbrains.kotlinx.lincheck.annotations.Param;
+import org.jetbrains.kotlinx.lincheck.paramgen.IntGen;
+import org.jetbrains.kotlinx.lincheck.strategy.stress.StressCTest;
 import org.junit.Test;
 
-
-@Param(name = "key", gen = IntGen.class, conf = "1:3")
-@StressCTest
-@StressCTest(iterations = 10, actorsPerThread = {"30:30", "30:30"},
-    verifier = LongExLinearizabilityVerifier.class)
+@StressCTest(sequentialSpecification = SequentialSetImpl.class)
+@Param(name = "key", gen = IntGen.class, conf = "1:5")
 public class LinearizabilityTest {
-    private Set set;
-
-    @Reset
-    public void reset() {
-        set = new SetImpl();
-    }
+    private Set set = new SetImpl();
 
     @Operation(params = "key")
     public boolean add(int x) {

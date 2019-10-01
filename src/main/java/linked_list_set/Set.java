@@ -2,8 +2,6 @@ package linked_list_set;
 
 /**
  * Stack interface.
- *
- * @author Nikita Koval
  */
 public interface Set {
 

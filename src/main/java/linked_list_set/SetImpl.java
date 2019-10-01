@@ -15,8 +15,7 @@ public class SetImpl implements Set {
         Node cur, next;
     }
 
-    private final Node head = new Node(Integer.MIN_VALUE,
-        new Node(Integer.MAX_VALUE, null));
+    private final Node head = new Node(Integer.MIN_VALUE, new Node(Integer.MAX_VALUE, null));
 
     /**
      * Returns the {@link Window}, where cur.x < x <= next.x

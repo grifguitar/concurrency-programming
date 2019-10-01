@@ -19,18 +19,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.devexperts.lincheck</groupId>
-            <artifactId>core</artifactId>
-            <version>1.9</version>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>lincheck</artifactId>
+            <version>2.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <repositories>
         <repository>
-            <id>bintray-devexperts-Maven</id>
+            <id>bintray-kotlin-kotlinx</id>
             <name>bintray</name>
-            <url>https://dl.bintray.com/devexperts/Maven</url>
+            <url>https://kotlin.bintray.com/kotlinx</url>
         </repository>
     </repositories>
 
@@ -38,7 +38,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
