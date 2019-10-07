@@ -5,7 +5,7 @@ import org.jetbrains.kotlinx.lincheck.annotations.Operation;
 import org.jetbrains.kotlinx.lincheck.strategy.stress.StressCTest;
 import org.junit.Test;
 
-@StressCTest(sequentialSpecification = SequentialQueue.class, invocationsPerIteration = 100000)
+@StressCTest(sequentialSpecification = SequentialQueue.class)
 public class LinearizabilityTest {
     private final Queue queue = new MSQueue();
 
