@@ -6,42 +6,42 @@ import kotlin.test.assertEquals
 
 class ConcurrentStressTest {
 
-    @Test
+    @Test(timeout = 1_000)
     fun `test on trees`() {
         testOnRandomGraphs(100, 99)
     }
 
-    @Test
+    @Test(timeout = 1_000)
     fun `test on very small graphs`() {
         testOnRandomGraphs(16, 25)
     }
 
-    @Test
+    @Test(timeout = 10_000)
     fun `test on small graphs`() {
         testOnRandomGraphs(100, 1000)
     }
 
-    @Test
+    @Test(timeout = 100_000)
     fun `test on big graphs`() {
         testOnRandomGraphs(10000, 100000)
     }
 
     private fun testOnRandomGraphs(nodes: Int, edges: Int) {
-        val r = Random()
+        val r = Random(0)
         repeat(GRAPHS) {
             val nodesList = randomConnectedGraph(nodes, edges)
             repeat(SEARCHES) {
                 val from = nodesList[r.nextInt(nodes)]
-                val to = nodesList[r.nextInt(nodes)]
-                val seqRes = shortestPathSequential(from, to)
+                shortestPathSequential(from)
+                val seqRes = nodesList.map { it.distance }
                 clearNodes(nodesList)
-                val parRes = shortestPathParallel(from, to)
+                shortestPathParallel(from)
+                val parRes = nodesList.map { it.distance }
                 clearNodes(nodesList)
                 assertEquals(seqRes, parRes)
             }
         }
     }
-
 }
 
 private const val GRAPHS = 10

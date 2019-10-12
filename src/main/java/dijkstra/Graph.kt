@@ -1,5 +1,6 @@
 package dijkstra
 
+import kotlinx.atomicfu.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -7,11 +8,16 @@ class Node {
     private val _outgoingEdges = arrayListOf<Edge>()
     val outgoingEdges: List<Edge> = _outgoingEdges
 
-    var distance = Integer.MAX_VALUE // USE ME FOR THE DIJKSTRA ALGORITHM!
+    val distance get() = distanceMutable.value
+    val distanceMutable = atomic(Integer.MAX_VALUE) // USE ME FOR THE DIJKSTRA ALGORITHM!
 
     fun addEdge(edge: Edge) {
         _outgoingEdges.add(edge)
     }
+}
+
+fun clearNodes(nodes: List<Node>) {
+    nodes.forEach { it.distanceMutable.value = Int.MAX_VALUE }
 }
 
 data class Edge(val to: Node, val weight: Int)
@@ -45,8 +51,4 @@ fun randomConnectedGraph(nodes: Int, edges: Int, maxWeight: Int = 100): List<Nod
         }
     }
     return nodesList
-}
-
-fun clearNodes(nodes: List<Node>) {
-    nodes.forEach { it.distance = Int.MAX_VALUE }
 }

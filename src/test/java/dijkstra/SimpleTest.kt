@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class SimpleTest {
 
-    @Test
+    @Test(timeout = 1_000)
     fun `Dijkstra on a small graph`() {
         val a = Node()
         val b = Node()
@@ -20,24 +20,20 @@ class SimpleTest {
         d.addEdge(Edge(c, 3))
         val nodes = listOf(a, b, c, d, e)
 
-        assertEquals(2, shortestPathSequential(a, b))
-        clearNodes(nodes)
-        assertEquals(2, shortestPathParallel(a, b))
-        clearNodes(nodes)
-
-        assertEquals(4, shortestPathSequential(a, c))
-        clearNodes(nodes)
-        assertEquals(4, shortestPathParallel(a, c))
+        shortestPathSequential(a)
+        assertEquals(0, a.distance)
+        assertEquals(2, b.distance)
+        assertEquals(4, c.distance)
+        assertEquals(1, d.distance)
+        assertEquals(5, e.distance)
         clearNodes(nodes)
 
-        assertEquals(1, shortestPathSequential(a, d))
-        clearNodes(nodes)
-        assertEquals(1, shortestPathParallel(a, d))
-        clearNodes(nodes)
-
-        assertEquals(5, shortestPathSequential(a, e))
-        clearNodes(nodes)
-        assertEquals(5, shortestPathParallel(a, e))
+        shortestPathParallel(a)
+        assertEquals(0, a.distance)
+        assertEquals(2, b.distance)
+        assertEquals(4, c.distance)
+        assertEquals(1, d.distance)
+        assertEquals(5, e.distance)
         clearNodes(nodes)
     }
 }
