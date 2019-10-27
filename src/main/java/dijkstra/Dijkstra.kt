@@ -11,7 +11,7 @@ private val NODE_DISTANCE_COMPARATOR = Comparator<Node> { o1, o2 -> Integer.comp
 fun shortestPathParallel(start: Node) {
     val workers = Runtime.getRuntime().availableProcessors()
     // The distance to the start node is `0`
-    start.distanceMutable.value = 0
+    start.distance = 0
     // Create a priority (by distance) queue and add the start node into it
     val q = PriorityQueue(workers, NODE_DISTANCE_COMPARATOR) // TODO replace me with a multi-queue based PQ!
     q.add(start)

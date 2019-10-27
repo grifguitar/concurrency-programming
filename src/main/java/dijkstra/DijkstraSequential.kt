@@ -6,14 +6,14 @@ private val NODE_DISTANCE_COMPARATOR = Comparator<Node> { o1, o2 -> Integer.comp
 
 // Returns `Integer.MAX_VALUE` if a path has not been found.
 fun shortestPathSequential(start: Node) {
-    start.distanceMutable.value = 0
+    start.distance = 0
     val q = PriorityQueue<Node>(NODE_DISTANCE_COMPARATOR)
     q.add(start)
     while (q.isNotEmpty()) {
         val cur = q.poll()
         for (e in cur.outgoingEdges) {
             if (e.to.distance > cur.distance + e.weight) {
-                e.to.distanceMutable.value = cur.distance + e.weight
+                e.to.distance = cur.distance + e.weight
                 q.remove(e.to) // inefficient, but used for tests only
                 q.add(e.to)
             }

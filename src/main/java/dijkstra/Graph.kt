@@ -8,8 +8,11 @@ class Node {
     private val _outgoingEdges = arrayListOf<Edge>()
     val outgoingEdges: List<Edge> = _outgoingEdges
 
-    val distance get() = distanceMutable.value
-    val distanceMutable = atomic(Integer.MAX_VALUE) // USE ME FOR THE DIJKSTRA ALGORITHM!
+    private val _distance = atomic(Integer.MAX_VALUE)
+    var distance // USE ME FOR THE DIJKSTRA ALGORITHM!
+        get() = _distance.value
+        set(value) { _distance.value = value }
+    fun casDistance(cur: Int, update: Int) = _distance.compareAndSet(cur, update)
 
     fun addEdge(edge: Edge) {
         _outgoingEdges.add(edge)
@@ -17,7 +20,7 @@ class Node {
 }
 
 fun clearNodes(nodes: List<Node>) {
-    nodes.forEach { it.distanceMutable.value = Int.MAX_VALUE }
+    nodes.forEach { it.distance = Int.MAX_VALUE }
 }
 
 data class Edge(val to: Node, val weight: Int)
