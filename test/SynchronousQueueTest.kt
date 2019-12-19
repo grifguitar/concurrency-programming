@@ -11,7 +11,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @LogLevel(DEBUG)
-@StressCTest(actorsBefore = 0, threads = 3, actorsPerThread = 3, invocationsPerIteration = 20_000,
+@StressCTest(actorsBefore = 0, threads = 2, actorsPerThread = 3, invocationsPerIteration = 20_000,
              sequentialSpecification = SynchronousQueueSequential::class)
 class SynchronousQueueTest : SynchronousQueue<Int> {
     val q = SynchronousQueueMS<Int>()
