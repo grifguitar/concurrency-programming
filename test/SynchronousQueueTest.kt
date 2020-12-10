@@ -1,29 +1,45 @@
-import org.jetbrains.kotlinx.lincheck.LinChecker
-import org.jetbrains.kotlinx.lincheck.LoggingLevel
-import org.jetbrains.kotlinx.lincheck.LoggingLevel.DEBUG
-import org.jetbrains.kotlinx.lincheck.annotations.LogLevel
 import org.jetbrains.kotlinx.lincheck.annotations.Operation
-import org.jetbrains.kotlinx.lincheck.strategy.stress.StressCTest
+import org.jetbrains.kotlinx.lincheck.check
+import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.ModelCheckingOptions
+import org.jetbrains.kotlinx.lincheck.strategy.stress.StressOptions
 import org.jetbrains.kotlinx.lincheck.verifier.VerifierState
 import org.junit.Test
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-@LogLevel(DEBUG)
-@StressCTest(actorsBefore = 0, threads = 2, actorsPerThread = 3, invocationsPerIteration = 20_000,
-             sequentialSpecification = SynchronousQueueSequential::class)
 class SynchronousQueueTest : SynchronousQueue<Int> {
-    val q = SynchronousQueueMS<Int>()
+    private val q = SynchronousQueueMS<Int>()
 
-    @Operation
-    override suspend fun send(element: Int) { q.send(element) }
+    @Operation(cancellableOnSuspension = false)
+    override suspend fun send(element: Int) {
+        q.send(element)
+    }
 
-    @Operation
+    @Operation(cancellableOnSuspension = false)
     override suspend fun receive(): Int = q.receive()
 
     @Test
-    fun runTest() = LinChecker.check(this::class.java)
+    fun stressTest() = StressOptions()
+        .iterations(100)
+        .invocationsPerIteration(50_000)
+        .actorsBefore(0)
+        .actorsAfter(0)
+        .threads(3)
+        .actorsPerThread(3)
+        .sequentialSpecification(SynchronousQueueSequential::class.java)
+        .check(this::class.java)
+
+    @Test
+    fun modelCheckingTest() = ModelCheckingOptions()
+        .iterations(100)
+        .invocationsPerIteration(50_000)
+        .actorsBefore(0)
+        .actorsAfter(0)
+        .threads(3)
+        .actorsPerThread(3)
+        .sequentialSpecification(SynchronousQueueSequential::class.java)
+        .check(this::class.java)
 }
 
 class SynchronousQueueSequential : SynchronousQueue<Int>, VerifierState() {

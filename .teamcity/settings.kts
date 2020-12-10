@@ -1,7 +1,7 @@
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
 
-version = "2019.1"
+version = "2020.1"
 
 project {
     buildType {
@@ -9,7 +9,6 @@ project {
         name = "Build"
         vcs {
             root(DslContext.settingsRoot)
-            branchFilter = "+:<default>"
         }
     }
 }

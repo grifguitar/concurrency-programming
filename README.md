@@ -9,9 +9,8 @@
 
 В файле [`src/SynchronousQueue.kt`](src/SynchronousQueue.kt) находится описание интерфейса synchronous queue, 
 который  вам предстоит реализовать. Ваше решение должно быть в файле [`src/SynchronousQueueMS.kt`](src/SynchronousQueueMS.kt).
-Используйте `j.u.c.atomic.AtomicReference` для общих переменных между потоками, на которых необходимо выполнять операцию `CAS`.
 
-При реализации алгоритма вам может потребоваться начать всю операцию заново после вызова `coroutineSuspend`, 
+При реализации алгоритма вам может потребоваться начать всю операцию заново после вызова `suspendCoroutine`, 
 вы можете выразить эту логику следующим образом: 
 ```kotlin 
 val res = suspendCoroutine<Any> sc@ { cont ->
