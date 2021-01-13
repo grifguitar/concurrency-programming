@@ -22,7 +22,7 @@ class SynchronousQueueTest : SynchronousQueue<Int> {
     @Test
     fun stressTest() = StressOptions()
         .iterations(100)
-        .invocationsPerIteration(50_000)
+        .invocationsPerIteration(10_000)
         .actorsBefore(0)
         .actorsAfter(0)
         .threads(3)
@@ -33,10 +33,10 @@ class SynchronousQueueTest : SynchronousQueue<Int> {
     @Test
     fun modelCheckingTest() = ModelCheckingOptions()
         .iterations(100)
-        .invocationsPerIteration(50_000)
+        .invocationsPerIteration(10_000)
         .actorsBefore(0)
         .actorsAfter(0)
-        .threads(3)
+        .threads(2)
         .actorsPerThread(3)
         .sequentialSpecification(SynchronousQueueSequential::class.java)
         .check(this::class.java)
