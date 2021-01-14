@@ -1,0 +1,8 @@
+<Last-Name> <First-Name> # <-- fill it in
+# Each line is: <state1> -> <state2>
+# Each <state> is: [Px,Qy,a,b]
+
+# transition from the initial state where P is making a step
+[P1,Q1,0,0] -> [P2,Q1,1,0]
+
+# todo: write the rest of transitions
