@@ -2,37 +2,120 @@ package dijkstra
 
 import java.util.*
 import java.util.concurrent.Phaser
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.locks.*
 import kotlin.Comparator
+import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 private val NODE_DISTANCE_COMPARATOR = Comparator<Node> { o1, o2 -> Integer.compare(o1!!.distance, o2!!.distance) }
 
+class Pair<S, T>(val x: S, val y: T)
+
+class MultiQueue(private val size: Int) {
+    private val multiQueue = ArrayList<Pair<PriorityQueue<Node>, Lock>>()
+    private val rnd = Random()
+    private val cmp = NODE_DISTANCE_COMPARATOR
+
+    init {
+        for (i in 1..size) {
+            multiQueue.add(Pair(PriorityQueue(cmp), ReentrantLock()))
+        }
+    }
+
+    fun add(node: Node) {
+        while (true) {
+            val ind = rnd.nextInt(size)
+
+            if (multiQueue[ind].y.tryLock()) {
+                try {
+                    multiQueue[ind].x.add(node)
+                    return
+                } finally {
+                    multiQueue[ind].y.unlock()
+                }
+            }
+        }
+    }
+
+    fun poll(): Node? {
+        while (true) {
+            val ind1 = rnd.nextInt(size)
+            val ind2 = rnd.nextInt(size)
+
+            if (multiQueue[ind1].y.tryLock()) {
+                try {
+                    if (multiQueue[ind2].y.tryLock()) {
+                        try {
+
+                            val node1: Node? =
+                                if (!multiQueue[ind1].x.isEmpty()) multiQueue[ind1].x.peek() else null
+                            val node2: Node? =
+                                if (!multiQueue[ind2].x.isEmpty()) multiQueue[ind2].x.peek() else null
+                            return if (node1 != null && node2 != null) {
+                                if (cmp.compare(node1, node2) < 0) {
+                                    multiQueue[ind1].x.poll()
+                                } else {
+                                    multiQueue[ind2].x.poll()
+                                }
+                            } else {
+                                if (node1 != null) {
+                                    multiQueue[ind1].x.poll()
+                                } else {
+                                    if (node2 != null) {
+                                        multiQueue[ind2].x.poll()
+                                    } else {
+                                        null
+                                    }
+                                }
+                            }
+
+                        } finally {
+                            multiQueue[ind2].y.unlock()
+                        }
+                    }
+                } finally {
+                    multiQueue[ind1].y.unlock()
+                }
+            }
+        }
+    }
+}
+
 // Returns `Integer.MAX_VALUE` if a path has not been found.
 fun shortestPathParallel(start: Node) {
     val workers = Runtime.getRuntime().availableProcessors()
-    // The distance to the start node is `0`
+    val q = MultiQueue(2 * workers)
     start.distance = 0
-    // Create a priority (by distance) queue and add the start node into it
-    val q = PriorityQueue(workers, NODE_DISTANCE_COMPARATOR) // TODO replace me with a multi-queue based PQ!
     q.add(start)
-    // Run worker threads and wait until the total work is done
-    val onFinish = Phaser(workers + 1) // `arrive()` should be invoked at the end by each worker
+    val activeNodes = AtomicInteger(1)
+    val onFinish = Phaser(workers + 1)
     repeat(workers) {
         thread {
-            while (true) {
-                // TODO Write the required algorithm here,
-                // TODO break from this loop when there is no more node to process.
-                // TODO Be careful, "empty queue" != "all nodes are processed".
-//                val cur: Node? = synchronized(q) { q.poll() }
-//                if (cur == null) {
-//                    if (workIsDone) break else continue
-//                }
-//                for (e in cur.outgoingEdges) {
-//                    if (e.to.distance > cur.distance + e.weight) {
-//                        e.to.distance = cur.distance + e.weight
-//                        q.addOrDecreaseKey(e.to)
-//                    }
-//                }
+            while (activeNodes.get() > 0) {
+                val curNode: Node? = q.poll()
+
+                if (curNode == null) {
+                    if (activeNodes.get() == 0) break else continue
+                }
+
+                for (curEdge in curNode.outgoingEdges) {
+                    val newDist = curNode.distance + curEdge.weight
+                    while (true) {
+                        val curDist = curEdge.to.distance
+                        if (curDist > newDist) {
+                            if (curEdge.to.casDistance(curDist, newDist)) {
+                                q.add(curEdge.to)
+                                activeNodes.incrementAndGet()
+                                break
+                            }
+                        } else {
+                            break
+                        }
+                    }
+                }
+
+                activeNodes.decrementAndGet()
             }
             onFinish.arrive()
         }
