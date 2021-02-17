@@ -14,14 +14,26 @@ class FAAQueue<T> {
      * Adds the specified element [x] to the queue.
      */
     fun enqueue(x: T) {
-        val enqIdx = tail.value.enqIdx++
-        if (enqIdx >= SEGMENT_SIZE) {
-            val newTail = Segment(x)
-            tail.value.next = newTail
-            tail.value = newTail
-            return
+        while (true) {
+            val curTail = tail.value
+            val enqIdx = curTail.enqIdx.getAndIncrement()
+            if (enqIdx >= SEGMENT_SIZE) {
+                val newTail = Segment(x)
+                if (curTail.next.compareAndSet(null, newTail)) {
+                    tail.compareAndSet(curTail, newTail)
+                    return
+                } else {
+                    val nextTail = curTail.next.value
+                    if (nextTail != null) {
+                        tail.compareAndSet(curTail, nextTail)
+                    }
+                }
+            } else {
+                if (curTail.elements[enqIdx].compareAndSet(null, x)) {
+                    return
+                }
+            }
         }
-        tail.value.elements[enqIdx] = x
     }
 
     /**
@@ -31,14 +43,14 @@ class FAAQueue<T> {
      */
     fun dequeue(): T? {
         while (true) {
-            if (head.value.isEmpty) {
-                if (head.value.next == null) return null
-                head.value = head.value.next!!
+            val curHead = head.value
+            val deqIdx = curHead.deqIdx.getAndIncrement()
+            if (deqIdx >= SEGMENT_SIZE) {
+                val nextHead = curHead.next.value ?: return null
+                head.compareAndSet(curHead, nextHead)
                 continue
             }
-            val deqIdx = head.value.deqIdx++
-            val res = head.value.elements[deqIdx]
-            head.value.elements[deqIdx] = DONE
+            val res = curHead.elements[deqIdx].getAndSet(DONE) ?: continue
             return res as T?
         }
     }
@@ -47,33 +59,38 @@ class FAAQueue<T> {
      * Returns `true` if this queue is empty;
      * `false` otherwise.
      */
-    val isEmpty: Boolean get() {
-        while (true) {
-            if (head.value.isEmpty) {
-                if (head.value.next == null) return true
-                head.value = head.value.next!!
-                continue
-            } else {
-                return false
+    val isEmpty: Boolean
+        get() {
+            while (true) {
+                val curHead = head.value
+                val deqIdx = curHead.deqIdx.value
+                if (deqIdx >= SEGMENT_SIZE) {
+                    val nextHead = curHead.next.value ?: return true
+                    head.compareAndSet(curHead, nextHead)
+                    continue
+                } else {
+                    return false
+                }
             }
         }
-    }
 }
 
 private class Segment {
-    var next: Segment? = null
-    var enqIdx = 0 // index for the next enqueue operation
-    var deqIdx = 0 // index for the next dequeue operation
-    val elements = arrayOfNulls<Any>(SEGMENT_SIZE)
+    val next: AtomicRef<Segment?> = atomic(null)
+    val enqIdx: AtomicInt // index for the next enqueue operation
+    val deqIdx: AtomicInt // index for the next dequeue operation
+    val elements: AtomicArray<Any?> = atomicArrayOfNulls(SEGMENT_SIZE)
 
-    constructor() // for the first segment creation
-
-    constructor(x: Any?) { // each next new segment should be constructed with an element
-        enqIdx = 1
-        elements[0] = x
+    constructor() { // for the first segment creation
+        enqIdx = atomic(0)
+        deqIdx = atomic(0)
     }
 
-    val isEmpty: Boolean get() = deqIdx >= enqIdx || deqIdx >= SEGMENT_SIZE
+    constructor(x: Any?) { // each next new segment should be constructed with an element
+        enqIdx = atomic(1)
+        deqIdx = atomic(0)
+        elements[0].getAndSet(x)
+    }
 
 }
 
