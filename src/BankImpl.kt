@@ -9,7 +9,6 @@ import kotlinx.atomicfu.*
  * Account instances in [accounts] array never suffer from ABA problem.
  * See also "Practical lock-freedom" by Keir Fraser. See [acquire] method.
  *
- * :TODO: This implementation has to be completed, so that it is thread-safe and lock-free.
  */
 class BankImpl(override val numberOfAccounts: Int) : Bank {
     /**
@@ -70,7 +69,6 @@ class BankImpl(override val numberOfAccounts: Int) : Bank {
     }
 
     override fun withdraw(index: Int, amount: Long): Long {
-        // todo: write withdraw operation using deposit as an example
         /*
          * Basically, implementation of this method must perform the logic of the following code "atomically":
          */
@@ -113,7 +111,6 @@ class BankImpl(override val numberOfAccounts: Int) : Bank {
      * This method returns null if op.completed is true.
      */
     private fun acquire(index: Int, op: Op): AcquiredAccount? {
-        // todo: write the implementation of this method with the following logic:
         /*
          * This method must loop trying to replace accounts[index] with an instance of
          *     new AcquiredAccount(<old-amount>, op) until that successfully happens and return the
@@ -136,9 +133,9 @@ class BankImpl(override val numberOfAccounts: Int) : Bank {
 //        return acquiredAccount
         while (true) {
             val account = account(index)
-            if (account is AcquiredAccount && account.op == op) return account
-            if (account.invokeOperation()) continue
             if (op.completed) return null
+            if (account is AcquiredAccount && account.op === op) return account
+            if (account.invokeOperation()) continue
             val acquiredAccount = AcquiredAccount(account.amount, op)
             if (accounts[index].compareAndSet(account, acquiredAccount)) {
                 return acquiredAccount
@@ -244,7 +241,6 @@ class BankImpl(override val numberOfAccounts: Int) : Bank {
         var errorMessage: String? = null
 
         override fun invokeOperation() {
-            // todo: write implementation for this method, use TotalAmountOp as an example
             /*
              * In the implementation of this operation only two accounts (with fromIndex and toIndex) needs
              * to be acquired. Unlike TotalAmountOp, this operation has its own result in errorMessage string,
