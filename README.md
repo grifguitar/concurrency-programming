@@ -46,4 +46,3 @@
 + [Транзакционная память](https://drive.google.com/file/d/1aBZCIQW8bJwO41jRVVAk8vpD6s_YsMOe/view?usp=sharing)
 
 Курс лекций Романа Елизарова и Никиты Коваля.
-п
